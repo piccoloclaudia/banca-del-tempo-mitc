@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banca del tempo MITC</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f5f4f0; --bg3: #eeede9;
+    --text: #1a1a18; --text2: #5f5e5a; --text3: #888780;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.2);
+    --teal: #085041; --teal-bg: #E1F5EE; --teal-border: #5DCAA5;
+    --purple: #3C3489; --purple-bg: #EEEDFE; --purple-border: #AFA9EC;
+    --coral: #712B13; --coral-bg: #FAECE7; --coral-border: #F0997B;
+    --red-bg: #FCEBEB; --red: #791F1F; --red-border: #F09595;
+    --amber-bg: #FAEEDA; --amber: #633806; --amber-border: #EF9F27;
+    --radius: 10px; --radius-sm: 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg2: #252523; --bg3: #2e2e2b;
+      --text: #e8e6de; --text2: #9c9a92; --text3: #6e6d68;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.18);
+      --teal: #5DCAA5; --teal-bg: #04342C; --teal-border: #0F6E56;
+      --purple: #AFA9EC; --purple-bg: #26215C; --purple-border: #534AB7;
+      --coral: #F0997B; --coral-bg: #4A1B0C; --coral-border: #993C1D;
+      --red-bg: #501313; --red: #F09595; --red-border: #A32D2D;
+      --amber-bg: #412402; --amber: #FAC775; --amber-border: #854F0B;
+    }
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; min-height: 100vh; }
+  .header { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 14px 16px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 10; }
+  .header-title { font-size: 16px; font-weight: 600; }
+  .header-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+  .nav { display: flex; background: var(--bg2); border-bottom: 0.5px solid var(--border); overflow-x: auto; }
+  .nav-btn { flex: 1; min-width: 80px; padding: 12px 8px; border: none; background: transparent; color: var(--text2); font-size: 12px; font-weight: 500; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; border-bottom: 2px solid transparent; transition: all .15s; white-space: nowrap; }
+  .nav-btn i { font-size: 20px; }
+  .nav-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--bg); }
+  .content { padding: 16px; max-width: 600px; margin: 0 auto; }
+  .panel { display: none; } .panel.active { display: block; }
+  .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+  .badge-b { background: var(--purple-bg); color: var(--purple); }
+  .badge-d { background: var(--teal-bg); color: var(--teal); }
+  .badge-bach { background: var(--amber-bg); color: var(--amber); }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+  .field input, .field select, .field textarea { width: 100%; padding: 10px 12px; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-size: 15px; font-family: inherit; appearance: none; }
+  .field textarea { height: 72px; resize: none; }
+  .field .hint { font-size: 11px; color: var(--text3); margin-top: 5px; }
+  .scambio-box { border: 0.5px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 14px; }
+  .scambio-half { padding: 14px; }
+  .scambio-half + .scambio-half { border-top: 0.5px solid var(--border); }
+  .scambio-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .sl-out { color: var(--teal); } .sl-in { color: var(--purple); }
+  .recap-mini { background: var(--bg2); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 8px; font-size: 13px; color: var(--text2); display: none; }
+  .recap-mini.show { display: block; }
+  .btn { width: 100%; padding: 13px; font-size: 15px; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm); border: none; background: var(--teal); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity .15s; }
+  .btn:active { opacity: .8; }
+  .btn-outline { background: transparent; border: 0.5px solid var(--border2); color: var(--text); }
+  .toast { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 14px; margin-bottom: 12px; display: none; }
+  .toast.ok { background: var(--teal-bg); color: var(--teal); border: 0.5px solid var(--teal-border); }
+  .toast.err { background: var(--red-bg); color: var(--red); border: 0.5px solid var(--red-border); }
+  .blocked { background: var(--red-bg); border: 0.5px solid var(--red-border); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; display: none; }
+  .blocked-title { font-size: 14px; font-weight: 700; color: var(--red); margin-bottom: 6px; }
+  .blocked-body { font-size: 13px; color: var(--red); line-height: 1.5; }
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .p-lib { background: #EAF3DE; color: #27500A; }
+  .p-occ { background: var(--amber-bg); color: var(--amber); }
+  .p-ero { background: var(--teal-bg); color: var(--teal); }
+  .slot-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+  .slot-row:last-child { border-bottom: none; }
+  .slot-info { font-size: 14px; font-weight: 500; }
+  .slot-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .saldo-card { background: var(--bg2); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; }
+  .saldo-nome { font-size: 14px; font-weight: 600; }
+  .saldo-val { font-size: 28px; font-weight: 700; margin-left: auto; }
+  .saldo-pos { color: var(--teal); } .saldo-neg { color: var(--red); } .saldo-zero { color: var(--text2); }
+  .empty-state { text-align: center; padding: 40px 16px; color: var(--text2); }
+  .empty-state i { font-size: 40px; display: block; margin-bottom: 12px; }
+  .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); margin-bottom: 10px; margin-top: 20px; }
+  .loading { text-align: center; padding: 30px; color: var(--text2); }
+  .loading i { font-size: 30px; display: block; margin-bottom: 8px; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">Banca del tempo MITC</div>
+    <div class="header-sub">Corso 2024/25 · amministrata da Claudia</div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="go('bacheca',this)">
+    <i class="ti ti-layout-board"></i>Bacheca
+  </button>
+  <button class="nav-btn" onclick="go('prenota',this)">
+    <i class="ti ti-calendar-plus"></i>Prenota
+  </button>
+  <button class="nav-btn" onclick="go('proponi',this)">
+    <i class="ti ti-bulb"></i>Proponi
+  </button>
+  <button class="nav-btn" onclick="go('saldo',this)">
+    <i class="ti ti-chart-bar"></i>Il mio saldo
+  </button>
+</nav>
+
+<div class="content">
+
+  <!-- BACHECA -->
+  <div id="bacheca" class="panel active">
+    <div class="section-title">Slot liberi di Claudia</div>
+    <div id="bach-slots"><div class="loading"><i class="ti ti-loader-2"></i>Caricamento…</div></div>
+    <div class="section-title">Cosa offre Claudia</div>
+    <div id="bach-offro"><div class="loading"><i class="ti ti-loader-2"></i></div></div>
+    <div class="section-title">Cosa cerca Claudia</div>
+    <div id="bach-cerco"><div class="loading"><i class="ti ti-loader-2"></i></div></div>
+  </div>
+
+  <!-- PRENOTA -->
+  <div id="prenota" class="panel">
+    <div class="card">
+      <span class="badge badge-b">Prenotazione scambio</span>
+      <div id="toast-b" class="toast"></div>
+
+      <div class="field">
+        <label>Il tuo nome</label>
+        <input type="text" id="b-nome" placeholder="es. Anna Lombardi" oninput="checkSaldoB()">
+      </div>
+
+      <div id="b-blocked" class="blocked">
+        <div class="blocked-title"><i class="ti ti-lock" style="font-size:14px;margin-right:6px"></i>Prenotazione bloccata</div>
+        <div class="blocked-body">Il tuo saldo è negativo: hai ricevuto più ore di quante ne hai erogate. Contatta Claudia su WhatsApp per pareggiare il saldo prima di prenotare.</div>
+      </div>
+
+      <div id="b-form" style="display:none">
+        <div class="scambio-box">
+          <div class="scambio-half">
+            <div class="scambio-label sl-out"><i class="ti ti-arrow-down-circle"></i> Cosa voglio ricevere</div>
+            <div class="field" style="margin-bottom:10px">
+              <label>Competenza che chiedo a Claudia</label>
+              <select id="b-ricevo" onchange="aggiornaSlotRicevo()">
+                <option value="">— scegli —</option>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>Slot in cui voglio riceverla</label>
+              <select id="b-slot-r" onchange="showRecapR()">
+                <option value="">— prima scegli la competenza —</option>
+              </select>
+              <div class="recap-mini" id="recap-r"></div>
+            </div>
+          </div>
+          <div class="scambio-half">
+            <div class="scambio-label sl-in"><i class="ti ti-arrow-up-circle"></i> Cosa offro in cambio</div>
+            <div class="field" style="margin-bottom:10px">
+              <label>Competenza che erogo a Claudia</label>
+              <select id="b-offro" onchange="aggiornaSlotOffro()">
+                <option value="">— scegli —</option>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>Slot in cui la erogo</label>
+              <select id="b-slot-o" onchange="showRecapO()">
+                <option value="">— prima scegli la competenza —</option>
+              </select>
+              <div class="recap-mini" id="recap-o"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field"><label>Contatto (email o numero)</label><input type="text" id="b-contatto" placeholder="es. anna@mail.it"></div>
+        <div class="field"><label>Note (opzionale)</label><textarea id="b-note" placeholder="es. preferisco da remoto…"></textarea></div>
+        <button class="btn" onclick="submitB()"><i class="ti ti-check"></i>Conferma prenotazione</button>
+      </div>
+
+      <div id="b-empty" style="font-size:14px;color:var(--text2);padding:8px 0">Inserisci il tuo nome per procedere.</div>
+    </div>
+  </div>
+
+  <!-- PROPONI -->
+  <div id="proponi" class="panel">
+    <div class="card">
+      <span class="badge badge-d">Proponi una competenza</span>
+      <div id="toast-d" class="toast"></div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5">Suggerisci una competenza da aggiungere al catalogo della banca del tempo. Claudia valuterà la proposta.</p>
+      <div class="field"><label>Il tuo nome</label><input type="text" id="d-nome" placeholder="es. Federico Martini"></div>
+      <div class="field"><label>Competenza che proponi</label><input type="text" id="d-comp" placeholder="es. Sviluppo web · React"></div>
+      <div class="field"><label>Descrizione</label><textarea id="d-desc" placeholder="es. ho 2 anni di esperienza con React, posso aiutare con…"></textarea></div>
+      <div class="field"><label>Contatto</label><input type="text" id="d-contatto" placeholder="es. fede@mail.it"></div>
+      <button class="btn" onclick="submitD()"><i class="ti ti-send"></i>Invia proposta a Claudia</button>
+    </div>
+  </div>
+
+  <!-- SALDO -->
+  <div id="saldo" class="panel">
+    <div class="card">
+      <span class="badge badge-bach">Il mio saldo</span>
+      <div class="field">
+        <label>Il tuo nome</label>
+        <input type="text" id="s-nome" placeholder="es. Anna Lombardi" oninput="checkSaldoS()">
+      </div>
+      <div id="saldo-result" style="display:none">
+        <div class="saldo-card">
+          <div>
+            <div class="saldo-nome" id="s-nome-display"></div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px" id="s-stato"></div>
+          </div>
+          <div class="saldo-val" id="s-val"></div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.5">Saldo positivo = hai dato più di quanto ricevuto. Saldo negativo = devi erogare ore prima di poter prenotare.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── CONFIGURAZIONE ──────────────────────────────────────────
+// Sostituisci con l'URL della tua Web App pubblicata su Apps Script
+const API_URL = "https://script.google.com/macros/s/AKfycbzELLcFJmUOh-fvEB0K0tKTlf5oOi9DeZVpMfp6UFkqZNEPAxeHJpBcAdOEC3ieswaS/exec";
+
+// ── STATO ───────────────────────────────────────────────────
+let catalogo = { offro: [], cerco: [] };
+let slotsLiberi = [];
+
+// ── INIT ────────────────────────────────────────────────────
+async function init() {
+  await Promise.all([loadCatalogo(), loadSlots()]);
+  renderBacheca();
+}
+
+async function loadCatalogo() {
+  try {
+    const r = await fetch(`${API_URL}?action=catalogo`);
+    catalogo = await r.json();
+  } catch(e) {
+    catalogo = { offro: [], cerco: [] };
+  }
+}
+
+async function loadSlots() {
+  try {
+    const r = await fetch(`${API_URL}?action=slots`);
+    const data = await r.json();
+    slotsLiberi = data.slots || [];
+  } catch(e) {
+    slotsLiberi = [];
+  }
+}
+
+// ── BACHECA ─────────────────────────────────────────────────
+function renderBacheca() {
+  // Slot liberi
+  const slEl = document.getElementById('bach-slots');
+  if (slotsLiberi.length === 0) {
+    slEl.innerHTML = `<div class="empty-state"><i class="ti ti-calendar-off"></i>Nessuno slot libero al momento</div>`;
+  } else {
+    slEl.innerHTML = slotsLiberi.map(s =>
+      `<div class="slot-row">
+        <div><div class="slot-info">${s.data} · ${s.ora}</div><div class="slot-meta">${s.durata}h${s.note?' · '+s.note:''}</div></div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;font-weight:600;color:var(--text2)">${s.id}</span><span class="pill p-lib">Libero</span></div>
+      </div>`
+    ).join('');
+  }
+
+  // Catalogo offro
+  const ofEl = document.getElementById('bach-offro');
+  if (!catalogo.offro || catalogo.offro.length === 0) {
+    ofEl.innerHTML = `<div style="font-size:13px;color:var(--text2);font-style:italic">Nessuna competenza configurata</div>`;
+  } else {
+    ofEl.innerHTML = catalogo.offro.map(v =>
+      `<div style="display:inline-block;background:var(--coral-bg);color:var(--coral);border-radius:20px;padding:4px 12px;font-size:13px;font-weight:600;margin:0 6px 6px 0">${v}</div>`
+    ).join('');
+  }
+
+  // Catalogo cerco
+  const ceEl = document.getElementById('bach-cerco');
+  if (!catalogo.cerco || catalogo.cerco.length === 0) {
+    ceEl.innerHTML = `<div style="font-size:13px;color:var(--text2);font-style:italic">Nessuna preferenza configurata</div>`;
+  } else {
+    ceEl.innerHTML = catalogo.cerco.map(c =>
+      `<div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600">${c.comp}</div>
+        ${c.chi?`<div style="font-size:12px;color:var(--text2);margin-top:3px"><i class="ti ti-user" style="font-size:12px;margin-right:4px"></i>${c.chi}</div>`:''}
+      </div>`
+    ).join('');
+  }
+
+  // Popola selects Form B
+  const selR = document.getElementById('b-ricevo');
+  selR.innerHTML = '<option value="">— scegli —</option>' +
+    (catalogo.offro||[]).map(v=>`<option>${v}</option>`).join('');
+  const selO = document.getElementById('b-offro');
+  selO.innerHTML = '<option value="">— scegli —</option>' +
+    (catalogo.cerco||[]).map(c=>`<option value="${c.comp}">${c.comp}${c.chi?' ('+c.chi+')':''}</option>`).join('');
+}
+
+// ── FORM B ───────────────────────────────────────────────────
+let saldoCache = {};
+async function checkSaldoB() {
+  const nome = document.getElementById('b-nome').value.trim();
+  const blocked = document.getElementById('b-blocked');
+  const form = document.getElementById('b-form');
+  const empty = document.getElementById('b-empty');
+  if (!nome) { blocked.style.display='none'; form.style.display='none'; empty.style.display='block'; return; }
+  let saldo = 0;
+  try {
+    if (saldoCache[nome] !== undefined) { saldo = saldoCache[nome]; }
+    else {
+      const r = await fetch(`${API_URL}?action=saldo&nome=${encodeURIComponent(nome)}`);
+      const data = await r.json(); saldo = data.saldo || 0;
+      saldoCache[nome] = saldo;
+    }
+  } catch(e) {}
+  if (saldo < 0) { blocked.style.display='block'; form.style.display='none'; empty.style.display='none'; }
+  else { blocked.style.display='none'; form.style.display='block'; empty.style.display='none'; aggiornaSlotsSelects(); }
+}
+
+function getSlotOptsExcluding(excludeId) {
+  const opts = slotsLiberi.filter(s => s.id !== excludeId);
+  if (!opts.length) return '<option value="">Nessuno slot libero</option>';
+  return '<option value="">— scegli —</option>' +
+    opts.map(s=>`<option value="${s.id}">${s.id} · ${s.data} ${s.ora} · ${s.durata}h${s.note?' · '+s.note:''}</option>`).join('');
+}
+
+function aggiornaSlotsSelects() {
+  const curR = document.getElementById('b-slot-r').value;
+  const curO = document.getElementById('b-slot-o').value;
+  document.getElementById('b-slot-r').innerHTML = getSlotOptsExcluding(curO);
+  document.getElementById('b-slot-o').innerHTML = getSlotOptsExcluding(curR);
+  if(curR) document.getElementById('b-slot-r').value = curR;
+  if(curO) document.getElementById('b-slot-o').value = curO;
+}
+
+function aggiornaSlotRicevo() {
+  aggiornaSlotsSelects();
+  document.getElementById('recap-r').classList.remove('show');
+}
+function aggiornaSlotOffro() {
+  aggiornaSlotsSelects();
+  document.getElementById('recap-o').classList.remove('show');
+}
+
+function showRecapR() {
+  const id = document.getElementById('b-slot-r').value;
+  const el = document.getElementById('recap-r');
+  if (!id) { el.classList.remove('show'); return; }
+  const s = slotsLiberi.find(x=>x.id===id);
+  if (!s) { el.classList.remove('show'); return; }
+  el.textContent = `${s.data} · ${s.ora} · ${s.durata}h${s.note?' · '+s.note:''}`;
+  el.classList.add('show');
+  // Esclude dallo slot offro
+  const selO = document.getElementById('b-slot-o');
+  const oldO = selO.value;
+  selO.innerHTML = getSlotOptsExcluding(id);
+  if(oldO && oldO !== id) selO.value = oldO;
+}
+function showRecapO() {
+  const id = document.getElementById('b-slot-o').value;
+  const el = document.getElementById('recap-o');
+  if (!id) { el.classList.remove('show'); return; }
+  const s = slotsLiberi.find(x=>x.id===id);
+  if (!s) { el.classList.remove('show'); return; }
+  el.textContent = `${s.data} · ${s.ora} · ${s.durata}h${s.note?' · '+s.note:''}`;
+  el.classList.add('show');
+  const selR = document.getElementById('b-slot-r');
+  const oldR = selR.value;
+  selR.innerHTML = getSlotOptsExcluding(id);
+  if(oldR && oldR !== id) selR.value = oldR;
+}
+
+async function submitB() {
+  const nome = document.getElementById('b-nome').value.trim();
+  const ricevo = document.getElementById('b-ricevo').value;
+  const slotR = document.getElementById('b-slot-r').value;
+  const offro = document.getElementById('b-offro').value;
+  const slotO = document.getElementById('b-slot-o').value;
+  const contatto = document.getElementById('b-contatto').value.trim();
+  const note = document.getElementById('b-note').value.trim();
+  if (!nome||!ricevo||!slotR||!offro||!slotO) {
+    toast('toast-b','Compila tutti i campi obbligatori.','err'); return;
+  }
+  try {
+    const url = `${API_URL}?action=prenota&nome=${enc(nome)}&cosaRiceve=${enc(ricevo)}&slotRicezione=${enc(slotR)}&cosaOffre=${enc(offro)}&slotErogazione=${enc(slotO)}&contatto=${enc(contatto)}&note=${enc(note)}`;
+    const r = await fetch(url);
+    const data = await r.json();
+    if (data.ok) {
+      toast('toast-b', data.msg, 'ok');
+      ['b-nome','b-contatto','b-note'].forEach(id=>document.getElementById(id).value='');
+      ['b-ricevo','b-slot-r','b-offro','b-slot-o'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('b-form').style.display='none';
+      document.getElementById('b-empty').style.display='block';
+      saldoCache = {};
+      await loadSlots(); renderBacheca();
+    } else { toast('toast-b', data.msg, 'err'); }
+  } catch(e) { toast('toast-b','Errore di connessione. Riprova.','err'); }
+}
+
+// ── FORM D ───────────────────────────────────────────────────
+async function submitD() {
+  const nome = document.getElementById('d-nome').value.trim();
+  const comp = document.getElementById('d-comp').value.trim();
+  const desc = document.getElementById('d-desc').value.trim();
+  const cont = document.getElementById('d-contatto').value.trim();
+  if (!nome||!comp) { toast('toast-d','Inserisci nome e competenza.','err'); return; }
+  try {
+    const url = `${API_URL}?action=proposta&nome=${enc(nome)}&competenza=${enc(comp)}&descrizione=${enc(desc)}&contatto=${enc(cont)}`;
+    const r = await fetch(url);
+    const data = await r.json();
+    toast('toast-d', data.ok ? data.msg : data.msg, data.ok ? 'ok' : 'err');
+    if (data.ok) { ['d-nome','d-comp','d-desc','d-contatto'].forEach(id=>document.getElementById(id).value=''); }
+  } catch(e) { toast('toast-d','Errore di connessione.','err'); }
+}
+
+// ── SALDO ────────────────────────────────────────────────────
+async function checkSaldoS() {
+  const nome = document.getElementById('s-nome').value.trim();
+  const res = document.getElementById('saldo-result');
+  if (!nome || nome.length < 2) { res.style.display='none'; return; }
+  try {
+    const r = await fetch(`${API_URL}?action=saldo&nome=${encodeURIComponent(nome)}`);
+    const data = await r.json();
+    const saldo = data.saldo || 0;
+    document.getElementById('s-nome-display').textContent = nome;
+    const valEl = document.getElementById('s-val');
+    valEl.textContent = saldo > 0 ? '+'+saldo+'h' : saldo+'h';
+    valEl.className = 'saldo-val ' + (saldo > 0 ? 'saldo-pos' : saldo < 0 ? 'saldo-neg' : 'saldo-zero');
+    document.getElementById('s-stato').textContent = saldo < 0 ? 'Prenotazione bloccata' : 'Può prenotare';
+    res.style.display = 'block';
+  } catch(e) {}
+}
+
+// ── UTILITY ──────────────────────────────────────────────────
+function enc(s) { return encodeURIComponent(s||''); }
+function toast(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
+  setTimeout(() => el.style.display='none', 4000);
+}
+function go(id, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); btn.classList.add('active');
+}
+
+init();
+</script>
+</body>
+</html>
