@@ -60,9 +60,18 @@
   .btn { width: 100%; padding: 13px; font-size: 15px; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm); border: none; background: var(--teal); color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity .15s; }
   .btn:active { opacity: .8; }
   .btn-outline { background: transparent; border: 0.5px solid var(--border2); color: var(--text); }
-  .toast { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 14px; margin-bottom: 12px; display: none; }
-  .toast.ok { background: var(--teal-bg); color: var(--teal); border: 0.5px solid var(--teal-border); }
-  .toast.err { background: var(--red-bg); color: var(--red); border: 0.5px solid var(--red-border); }
+.toast { display: none; }
+.popup-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+.popup-overlay.show { display: flex; }
+.popup-box { background: var(--bg); border-radius: var(--radius); padding: 20px 24px; max-width: 340px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.2); text-align: center; }
+.popup-icon { font-size: 36px; margin-bottom: 12px; }
+.popup-msg { font-size: 15px; font-weight: 500; line-height: 1.5; margin-bottom: 16px; }
+.popup-btn { padding: 10px 24px; border-radius: var(--radius-sm); border: none; font-size: 14px; font-weight: 600; cursor: pointer; background: var(--teal); color: #fff; }
+.popup-ok .popup-icon { color: var(--teal); }
+.popup-ok .popup-msg { color: var(--teal); }
+.popup-err .popup-icon { color: var(--red); }
+.popup-err .popup-msg { color: var(--red); }
+.popup-err .popup-btn { background: var(--red); }
   .blocked { background: var(--red-bg); border: 0.5px solid var(--red-border); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; display: none; }
   .blocked-title { font-size: 14px; font-weight: 700; color: var(--red); margin-bottom: 6px; }
   .blocked-body { font-size: 13px; color: var(--red); line-height: 1.5; }
@@ -91,6 +100,14 @@
 }</style>
 </head>
 <body>
+
+ <div class="popup-overlay" id="popup-overlay" onclick="chiudiPopup()">
+  <div class="popup-box" id="popup-box" onclick="event.stopPropagation()">
+    <div class="popup-icon" id="popup-icon"></div>
+    <div class="popup-msg" id="popup-msg"></div>
+    <button class="popup-btn" onclick="chiudiPopup()" id="popup-btn">OK</button>
+  </div>
+</div>
 
 <div class="header">
   <div>
@@ -646,19 +663,33 @@ async function checkSaldoS() {
 
 // ── UTILITY ──────────────────────────────────────────────────
 function enc(s) { return encodeURIComponent(s||''); }
-function toast(id, msg, type, persistent = false) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
+
+ function toast(id, msg, type, persistent = false) {
+  // Mostra popup invece del toast inline
+  const overlay = document.getElementById('popup-overlay');
+  const box = document.getElementById('popup-box');
+  const icon = document.getElementById('popup-icon');
+  const msgEl = document.getElementById('popup-msg');
+  icon.innerHTML = type === 'ok'
+    ? '<i class="ti ti-circle-check"></i>'
+    : '<i class="ti ti-alert-circle"></i>';
+  msgEl.textContent = msg;
+  box.className = 'popup-box popup-' + (type === 'ok' ? 'ok' : 'err');
+  overlay.classList.add('show');
   if (!persistent) {
-    setTimeout(() => el.style.display='none', 10000);
+    setTimeout(() => chiudiPopup(), 10000);
   }
 }
+
+function chiudiPopup() {
+  document.getElementById('popup-overlay').classList.remove('show');
+}
+
 function go(id, btn) {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active'); btn.classList.add('active');
-  // Nascondi tutti i toast persistenti al click su qualsiasi scheda
-  document.querySelectorAll('.toast').forEach(t => t.style.display='none');
+  chiudiPopup();
 }
 
 init();
