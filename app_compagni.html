@@ -278,15 +278,12 @@ function renderPagamento(cat) {
     ...(cat.pagamento || []).map(v => ({ nome: v, solo: true })),
     ...(cat.offro || []).map(v => ({ nome: v, solo: false }))
   ];
-  el.innerHTML = tutte.map(a => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--border)">
-      <div>
-        <div style="font-size:14px;font-weight:500">${a.nome}</div>
-        ${a.solo
-          ? '<div style="font-size:11px;color:var(--text2);margin-top:2px">solo su richiesta</div>'
-          : '<div style="font-size:11px;color:var(--text2);margin-top:2px">disponibile anche come scambio</div>'}
-      </div>
-      <div style="font-size:14px;font-weight:600;color:var(--teal)">30€/h</div>
+ el.innerHTML = tutte.map(a => `
+    <div style="padding:10px 0;border-bottom:0.5px solid var(--border)">
+      <div style="font-size:14px;font-weight:500">${a.nome}</div>
+      ${a.solo
+        ? '<div style="font-size:11px;color:var(--text2);margin-top:2px">solo su richiesta</div>'
+        : '<div style="font-size:11px;color:var(--text2);margin-top:2px">disponibile anche come scambio</div>'}
     </div>`).join('');
 }
 
