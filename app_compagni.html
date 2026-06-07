@@ -100,9 +100,12 @@
     <i class="ti ti-layout-board"></i>Bacheca
   </button>
   <button class="nav-btn" onclick="go('prenota',this)">
-    <i class="ti ti-calendar-plus"></i>Prenota
+    <i class="ti ti-calendar-plus"></i>Prenota con scambio
   </button>
-  <button class="nav-btn" onclick="go('proponi',this)">
+  <button class="nav-btn" onclick="go('pagamento',this)">
+  <i class="ti ti-credit-card"></i>Prenota a pagamento
+</button>
+ <button class="nav-btn" onclick="go('proponi',this)">
     <i class="ti ti-bulb"></i>Proponi
   </button>
   <button class="nav-btn" onclick="go('saldo',this)">
@@ -182,6 +185,36 @@
     </div>
   </div>
 
+<!-- PRENOTA A PAGAMENTO -->
+<div id="pagamento" class="panel">
+  <div class="card">
+    <span class="badge" style="background:#FAECE7;color:#712B13">Attività a pagamento · 30€/ora</span>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5">
+      Queste attività sono disponibili a pagamento. Alcune sono anche disponibili come scambio nella banca del tempo.
+    </p>
+
+    <div id="lista-pagamento" style="margin-bottom:16px"></div>
+
+    <div style="background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">Come pagare</div>
+      <a href="https://www.paypal.me/claudiapiccoloBdT" target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#003087;color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-size:14px;font-weight:600;margin-bottom:8px">
+        <i class="ti ti-brand-paypal" style="font-size:18px"></i>Paga con PayPal
+      </a>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;padding:8px 10px;background:var(--bg);border-radius:var(--radius-sm);border:0.5px solid var(--border)">
+        💡 Quando paghi con PayPal seleziona <strong>"Invia a un amico"</strong> per evitare commissioni a entrambi.
+      </div>
+      <button onclick="copiaIBAN()" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;color:var(--text)">
+        <i class="ti ti-copy" style="font-size:18px"></i>Copia IBAN
+      </button>
+      <div id="iban-copied" style="font-size:12px;color:var(--teal);margin-top:6px;display:none">✓ IBAN copiato negli appunti</div>
+    </div>
+
+    <p style="font-size:12px;color:var(--text2);line-height:1.5">
+      Per prenotare scrivi a Claudia su WhatsApp indicando l'attività e la data preferita. Lo slot verrà confermato dopo il pagamento.
+    </p>
+  </div>
+</div>
+ 
   <!-- PROPONI -->
   <div id="proponi" class="panel">
     <div class="card">
@@ -229,9 +262,35 @@ let catalogo = { offro: [], cerco: [] };
 let slotsLiberi = [];
 
 // ── INIT ────────────────────────────────────────────────────
-async function init() {
+function copiaIBAN() {
+  navigator.clipboard.writeText("IT31N03268223000EMH00340866").then(() => {
+    document.getElementById('iban-copied').style.display = 'block';
+    setTimeout(() => document.getElementById('iban-copied').style.display='none', 3000);
+  });
+}
+
+function renderPagamento(cat) {
+  const el = document.getElementById('lista-pagamento');
+  if (!el) return;
+  const tutte = [
+    ...(cat.pagamento || []).map(v => ({ nome: v, solo: true })),
+    ...(cat.offro || []).map(v => ({ nome: v, solo: false }))
+  ];
+  el.innerHTML = tutte.map(a => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--border)">
+      <div>
+        <div style="font-size:14px;font-weight:500">${a.nome}</div>
+        ${a.solo
+          ? '<div style="font-size:11px;color:var(--text2);margin-top:2px">solo su richiesta</div>'
+          : '<div style="font-size:11px;color:var(--text2);margin-top:2px">disponibile anche come scambio</div>'}
+      </div>
+      <div style="font-size:14px;font-weight:600;color:var(--teal)">30€/h</div>
+    </div>`).join('');
+}
+ async function init() {
   await Promise.all([loadCatalogo(), loadSlots()]);
-  renderBacheca();
+  renderBacheca(); 
+  renderPagamento(catalogo);
 }
 
 async function loadCatalogo() {
@@ -396,7 +455,9 @@ async function submitB() {
       document.getElementById('b-form').style.display='none';
       document.getElementById('b-empty').style.display='block';
       saldoCache = {};
-      await loadSlots(); renderBacheca();
+      await loadSlots(); 
+      renderBacheca(); 
+      renderPagamento(catalogo);
     } else { toast('toast-b', data.msg, 'err'); }
   } catch(e) { toast('toast-b','Errore di connessione. Riprova.','err'); }
 }
