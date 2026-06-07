@@ -398,7 +398,8 @@ async function submitPagamento() {
  
  async function init() {
   await Promise.all([loadCatalogo(), loadSlots()]);
-  renderBacheca(); 
+  renderBacheca();
+  aggiornaSlotsSelects();
   renderPagamento(catalogo);
 }
 
