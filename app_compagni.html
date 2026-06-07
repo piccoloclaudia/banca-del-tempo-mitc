@@ -389,9 +389,13 @@ async function submitPagamento() {
   const contatto = document.getElementById('pag-contatto').value.trim();
   const note = document.getElementById('pag-note').value.trim();
 
-  if (!attivita || !slot || !nome) {
-    toast('toast-pag', 'Compila attività, slot e nome.', 'err'); return;
+if (!attivita || !slot || !nome || !contatto) {
+    toast('toast-pag', 'Compila tutti i campi obbligatori inclusa la email.', 'err'); return;
   }
+  if (!contatto.includes('@')) {
+    toast('toast-pag', 'Inserisci un indirizzo email valido.', 'err'); return;
+  }
+ 
   try {
     const url = `${API_URL}?action=prenotaPagamento&nome=${enc(nome)}&attivita=${enc(attivita)}&slot=${enc(slot)}&contatto=${enc(contatto)}&note=${enc(note)}`;
     const r = await fetch(url);
@@ -581,8 +585,12 @@ async function submitB() {
   const slotO = document.getElementById('b-slot-o').value;
   const contatto = document.getElementById('b-contatto').value.trim();
   const note = document.getElementById('b-note').value.trim();
-  if (!nome||!ricevo||!slotR||!offro||!slotO) {
-    toast('toast-b','Compila tutti i campi obbligatori.','err'); return;
+
+ if (!nome||!ricevo||!slotR||!offro||!slotO||!contatto) {
+    toast('toast-b','Compila tutti i campi obbligatori inclusa la email.','err'); return;
+  }
+  if (!contatto.includes('@')) {
+    toast('toast-b','Inserisci un indirizzo email valido.','err'); return;
   }
   try {
     const url = `${API_URL}?action=prenota&nome=${enc(nome)}&cosaRiceve=${enc(ricevo)}&slotRicezione=${enc(slotR)}&cosaOffre=${enc(offro)}&slotErogazione=${enc(slotO)}&contatto=${enc(contatto)}&note=${enc(note)}`;
