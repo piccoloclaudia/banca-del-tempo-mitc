@@ -133,7 +133,8 @@
 
       <div class="field">
         <label>Il tuo nome</label>
-        <input type="text" id="b-nome" placeholder="es. Anna Lombardi" oninput="checkSaldoB()">
+        <input type="text" id="b-nome" placeholder="es. Anna o Anna Lombardi)" oninput="checkSaldoB()" onblur="normalizzaNome('b-nome')"> 
+        <div class="hint">Inserisci nome per intero, non diminutivi, o nome e cognome in caso di omonimia</div>
       </div>
 
       <div id="b-blocked" class="blocked">
@@ -235,7 +236,8 @@
       <span class="badge badge-bach">Il mio saldo</span>
       <div class="field">
         <label>Il tuo nome</label>
-        <input type="text" id="s-nome" placeholder="es. Anna Lombardi" oninput="checkSaldoS()">
+        <input type="text" id="s-nome" placeholder="es. Anna" oninput="checkSaldoS()" onblur="normalizzaNome('s-nome')"> 
+         <div class="hint">Inserisci nome per intero, non diminutivi, o nome e cognome in caso di omonimia</div>
       </div>
       <div id="saldo-result" style="display:none">
         <div class="saldo-card">
@@ -287,6 +289,15 @@ function renderPagamento(cat) {
       <div style="font-size:14px;font-weight:600;color:var(--teal)">30€/h</div>
     </div>`).join('');
 }
+
+ function normalizzaNome(id) {
+  const el = document.getElementById(id);
+  if (!el || !el.value.trim()) return;
+  el.value = el.value.trim()
+    .toLowerCase()
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+ 
  async function init() {
   await Promise.all([loadCatalogo(), loadSlots()]);
   renderBacheca(); 
