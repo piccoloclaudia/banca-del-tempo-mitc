@@ -401,7 +401,7 @@ if (!attivita || !slot || !nome || !contatto) {
     const r = await fetch(url);
     const data = await r.json();
     if (data.ok) {
-      toast('toast-pag', data.msg, 'ok');
+      toast('toast-pag', data.msg, 'ok', true);
       ['pag-nome','pag-contatto','pag-note'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('pag-attivita').value = '';
       document.getElementById('pag-slot').value = '';
@@ -597,7 +597,7 @@ async function submitB() {
     const r = await fetch(url);
     const data = await r.json();
     if (data.ok) {
-      toast('toast-b', data.msg, 'ok');
+      toast('toast-b', data.msg, 'ok', true);
       ['b-nome','b-contatto','b-note'].forEach(id=>document.getElementById(id).value='');
       ['b-ricevo','b-slot-r','b-offro','b-slot-o'].forEach(id=>document.getElementById(id).value='');
       document.getElementById('b-form').style.display='none';
@@ -646,15 +646,19 @@ async function checkSaldoS() {
 
 // ── UTILITY ──────────────────────────────────────────────────
 function enc(s) { return encodeURIComponent(s||''); }
-function toast(id, msg, type) {
+function toast(id, msg, type, persistent = false) {
   const el = document.getElementById(id);
   el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
-  setTimeout(() => el.style.display='none', 4000);
+  if (!persistent) {
+    setTimeout(() => el.style.display='none', 10000);
+  }
 }
 function go(id, btn) {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active'); btn.classList.add('active');
+  // Nascondi tutti i toast persistenti al click su qualsiasi scheda
+  document.querySelectorAll('.toast').forEach(t => t.style.display='none');
 }
 
 init();
