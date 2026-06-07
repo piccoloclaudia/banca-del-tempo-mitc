@@ -231,23 +231,33 @@
       </button>
     </div>
 
-    <!-- STEP 3 -->
-    <div style="margin-bottom:16px">
-      <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Step 3 — Paga</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5">
-        Usa PayPal o bonifico prima della sessione.
-      </p>
-      <a href="https://www.paypal.me/claudiapiccoloBdT" target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#003087;color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-size:14px;font-weight:600;margin-bottom:8px">
-        <i class="ti ti-brand-paypal" style="font-size:18px"></i>Paga con PayPal
-      </a>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:8px;padding:8px 10px;background:var(--bg);border-radius:var(--radius-sm);border:0.5px solid var(--border)">
-        💡 Quando paghi con PayPal seleziona <strong>"Invia a un amico"</strong> per evitare commissioni a entrambi.
-      </div>
-      <button onclick="copiaIBAN()" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;color:var(--text)">
-        <i class="ti ti-copy" style="font-size:18px"></i>Copia IBAN per bonifico istantaneo
-      </button>
-      <div id="iban-copied" style="font-size:12px;color:var(--teal);margin-top:6px;display:none">✓ IBAN copiato negli appunti</div>
-    </div>
+<!-- STEP 3 -->
+<div style="margin-bottom:16px">
+  <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Step 3 — Paga</div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5">
+    Usa uno dei metodi qui sotto prima della sessione.
+  </p>
+
+  <div style="font-size:12px;color:var(--text2);margin-bottom:12px;padding:8px 10px;background:var(--bg);border-radius:var(--radius-sm);border:0.5px solid var(--border);line-height:1.6">
+    📋 Per tutti i metodi usa come causale: <strong>il tuo nome + attività prenotata</strong><br>
+    <span style="font-style:italic">es. Anna Lombardi - Coachee time</span>
+  </div>
+
+  <a href="https://www.satispay.com/app/match/link/user/S6Y-CON--805C9B21-776D-4B7F-8684-93D70F440B89?amount=3000&currency=EUR" target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#e2001a;color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-size:14px;font-weight:600;margin-bottom:4px">
+    <i class="ti ti-heart" style="font-size:18px"></i>Paga con Satispay <span style="font-size:11px;opacity:.85;margin-left:4px">(consigliato)</span>
+  </a>
+  <div style="font-size:11px;color:var(--text2);margin-bottom:10px;padding:0 4px">Zero commissioni</div>
+
+  <button onclick="copiaIBAN()" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;color:var(--text);margin-bottom:4px">
+    <i class="ti ti-copy" style="font-size:18px"></i>Copia IBAN · Bonifico istantaneo (Hype)
+  </button>
+  <div id="iban-copied" style="font-size:12px;color:var(--teal);margin-bottom:10px;display:none">✓ IBAN copiato negli appunti</div>
+
+  <a href="https://www.paypal.me/claudiapiccoloBdT/30" target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#003087;color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-size:14px;font-weight:600;margin-bottom:4px">
+    <i class="ti ti-brand-paypal" style="font-size:18px"></i>Paga con PayPal
+  </a>
+  <div style="font-size:11px;color:var(--text2);padding:0 4px">Potrebbero applicarsi commissioni</div>
+</div>
 
     <!-- STEP 4 -->
     <div style="background:var(--teal-bg,#E1F5EE);border-radius:var(--radius-sm);padding:12px 14px">
