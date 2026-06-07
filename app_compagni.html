@@ -190,29 +190,77 @@
 <div id="pagamento" class="panel">
   <div class="card">
     <span class="badge" style="background:#FAECE7;color:#712B13">Attività a pagamento · 30€/ora</span>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5">
-      Queste attività sono disponibili a pagamento. Alcune sono anche disponibili come scambio nella banca del tempo.
-    </p>
+    <div id="toast-pag" class="toast"></div>
 
-    <div id="lista-pagamento" style="margin-bottom:16px"></div>
+    <!-- STEP 1 -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Step 1 — Scegli</div>
+      <div class="field" style="margin-bottom:10px">
+        <label>Attività</label>
+        <select id="pag-attivita">
+          <option value="">— scegli —</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Slot disponibile</label>
+        <select id="pag-slot" onchange="aggiornaRecapPag()">
+          <option value="">— scegli —</option>
+        </select>
+        <div class="recap-mini" id="recap-pag"></div>
+      </div>
+    </div>
 
-    <div style="background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:12px">
-      <div style="font-size:13px;font-weight:600;margin-bottom:10px">Come pagare</div>
+    <!-- STEP 2 -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Step 2 — Prenota</div>
+      <div class="field" style="margin-bottom:10px">
+        <label>Il tuo nome</label>
+        <input type="text" id="pag-nome" placeholder="es. Anna Lombardi" onblur="normalizzaNome('pag-nome')">
+        <div class="hint">Inserisci nome e cognome per intero, senza diminutivi</div>
+      </div>
+      <div class="field" style="margin-bottom:10px">
+        <label>Contatto (email o numero)</label>
+        <input type="text" id="pag-contatto" placeholder="es. anna@mail.it">
+      </div>
+      <div class="field" style="margin-bottom:10px">
+        <label>Note (opzionale)</label>
+        <textarea id="pag-note" placeholder="es. preferisco da remoto…"></textarea>
+      </div>
+      <button class="btn" onclick="submitPagamento()">
+        <i class="ti ti-calendar-check"></i>Invia richiesta e riserva lo slot
+      </button>
+    </div>
+
+    <!-- STEP 3 -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Step 3 — Paga</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5">
+        Usa PayPal o bonifico prima della sessione.
+      </p>
       <a href="https://www.paypal.me/claudiapiccoloBdT" target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#003087;color:#fff;border-radius:var(--radius-sm);text-decoration:none;font-size:14px;font-weight:600;margin-bottom:8px">
         <i class="ti ti-brand-paypal" style="font-size:18px"></i>Paga con PayPal
       </a>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;padding:8px 10px;background:var(--bg);border-radius:var(--radius-sm);border:0.5px solid var(--border)">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px;padding:8px 10px;background:var(--bg);border-radius:var(--radius-sm);border:0.5px solid var(--border)">
         💡 Quando paghi con PayPal seleziona <strong>"Invia a un amico"</strong> per evitare commissioni a entrambi.
       </div>
       <button onclick="copiaIBAN()" style="width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;color:var(--text)">
-        <i class="ti ti-copy" style="font-size:18px"></i>Copia IBAN
+        <i class="ti ti-copy" style="font-size:18px"></i>Copia IBAN per bonifico istantaneo
       </button>
       <div id="iban-copied" style="font-size:12px;color:var(--teal);margin-top:6px;display:none">✓ IBAN copiato negli appunti</div>
     </div>
 
-    <p style="font-size:12px;color:var(--text2);line-height:1.5">
-      Per prenotare scrivi a Claudia su WhatsApp indicando l'attività e la data preferita. Lo slot verrà confermato dopo il pagamento.
-    </p>
+    <!-- STEP 4 -->
+    <div style="background:var(--teal-bg,#E1F5EE);border-radius:var(--radius-sm);padding:12px 14px">
+      <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Step 4 — Fatto</div>
+      <div style="font-size:13px;color:var(--teal)">Claudia riceverà la notifica e ti contatterà per conferma.</div>
+    </div>
+
+    <!-- Lista attività -->
+    <div style="margin-top:16px">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Attività disponibili</div>
+      <div id="lista-pagamento"></div>
+    </div>
+
   </div>
 </div>
  
@@ -272,17 +320,29 @@ function copiaIBAN() {
 }
 
 function renderPagamento(cat) {
+  // Popola select attività
+  const selPag = document.getElementById('pag-attivita');
+  if (selPag) {
+    const tutte = [
+      ...(cat.pagamento || []),
+      ...(cat.offro || [])
+    ];
+    selPag.innerHTML = '<option value="">— scegli —</option>' +
+      tutte.map(v => `<option>${v}</option>`).join('');
+  }
+
+  // Lista attività con etichetta
   const el = document.getElementById('lista-pagamento');
   if (!el) return;
   const tutte = [
     ...(cat.pagamento || []).map(v => ({ nome: v, solo: true })),
     ...(cat.offro || []).map(v => ({ nome: v, solo: false }))
   ];
- el.innerHTML = tutte.map(a => `
+  el.innerHTML = tutte.map(a => `
     <div style="padding:10px 0;border-bottom:0.5px solid var(--border)">
       <div style="font-size:14px;font-weight:500">${a.nome}</div>
       ${a.solo
-        ? '<div style="font-size:11px;color:var(--text2);margin-top:2px">solo a pagamento</div>'
+        ? '<div style="font-size:11px;color:var(--text2);margin-top:2px">solo su richiesta</div>'
         : '<div style="font-size:11px;color:var(--text2);margin-top:2px">disponibile anche come scambio</div>'}
     </div>`).join('');
 }
@@ -293,6 +353,47 @@ function renderPagamento(cat) {
   el.value = el.value.trim()
     .toLowerCase()
     .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+ function aggiornaRecapPag() {
+  const id = document.getElementById('pag-slot').value;
+  const el = document.getElementById('recap-pag');
+  if (!id) { el.classList.remove('show'); return; }
+  const s = slotsLiberi.find(x => x.id === id);
+  if (!s) { el.classList.remove('show'); return; }
+  el.textContent = `${s.data} · ${s.ora} · ${s.durata}h${s.note ? ' · ' + s.note : ''}`;
+  el.classList.add('show');
+}
+
+async function submitPagamento() {
+  const attivita = document.getElementById('pag-attivita').value;
+  const slot = document.getElementById('pag-slot').value;
+  const nome = document.getElementById('pag-nome').value.trim();
+  const contatto = document.getElementById('pag-contatto').value.trim();
+  const note = document.getElementById('pag-note').value.trim();
+
+  if (!attivita || !slot || !nome) {
+    toast('toast-pag', 'Compila attività, slot e nome.', 'err'); return;
+  }
+  try {
+    const url = `${API_URL}?action=prenotaPagamento&nome=${enc(nome)}&attivita=${enc(attivita)}&slot=${enc(slot)}&contatto=${enc(contatto)}&note=${enc(note)}`;
+    const r = await fetch(url);
+    const data = await r.json();
+    if (data.ok) {
+      toast('toast-pag', data.msg, 'ok');
+      ['pag-nome','pag-contatto','pag-note'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('pag-attivita').value = '';
+      document.getElementById('pag-slot').value = '';
+      document.getElementById('recap-pag').classList.remove('show');
+      await loadSlots();
+      renderBacheca();
+      renderPagamento(catalogo);
+    } else {
+      toast('toast-pag', data.msg, 'err');
+    }
+  } catch(e) {
+    toast('toast-pag', 'Errore di connessione. Riprova.', 'err');
+  }
 }
  
  async function init() {
@@ -398,6 +499,14 @@ function getSlotOptsExcluding(excludeId) {
 function aggiornaSlotsSelects() {
   const curR = document.getElementById('b-slot-r').value;
   const curO = document.getElementById('b-slot-o').value;
+  const selPagSlot = document.getElementById('pag-slot');
+  if (selPagSlot) {
+  selPagSlot.innerHTML = slotsLiberi.length
+    ? '<option value="">— scegli —</option>' + slotsLiberi.map(s =>
+        `<option value="${s.id}">${s.id} · ${s.data} ${s.ora} · ${s.durata}h${s.note ? ' · ' + s.note : ''}</option>`
+      ).join('')
+    : '<option value="">Nessuno slot libero</option>';
+  }
   document.getElementById('b-slot-r').innerHTML = getSlotOptsExcluding(curO);
   document.getElementById('b-slot-o').innerHTML = getSlotOptsExcluding(curR);
   if(curR) document.getElementById('b-slot-r').value = curR;
